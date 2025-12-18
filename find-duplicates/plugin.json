@@ -1,0 +1,18 @@
+{
+  "name": "fiftyone-find-duplicates",
+  "version": "1.0.0",
+  "description": "Find duplicate or near-duplicate images in FiftyOne datasets using brain similarity computation. Works with the FiftyOne MCP server.",
+  "author": {
+    "name": "Voxel51"
+  },
+  "repository": "https://github.com/voxel51/fiftyone-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "fiftyone",
+    "computer-vision",
+    "duplicates",
+    "similarity",
+    "deduplication",
+    "brain"
+  ]
+}

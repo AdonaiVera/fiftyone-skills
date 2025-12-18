@@ -1,0 +1,17 @@
+{
+  "name": "fiftyone-skills",
+  "owner": {
+    "name": "Voxel51"
+  },
+  "metadata": {
+    "description": "Agent Context Protocol (ACP) skills for computer vision workflows using FiftyOne.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "fiftyone-find-duplicates",
+      "source": "./find-duplicates",
+      "description": "Find duplicate or near-duplicate images in FiftyOne datasets using brain similarity computation. Use when users want to deduplicate datasets, find similar images, cluster visually similar content, or remove redundant samples. Requires FiftyOne MCP server with @voxel51/brain plugin installed."
+    }
+  ]
+}
