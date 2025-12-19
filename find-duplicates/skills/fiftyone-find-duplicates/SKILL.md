@@ -39,7 +39,10 @@ Wait 5-10 seconds for initialization.
 
 ### 3. Discover operators dynamically
 ```python
+# List all brain operators
 list_operators(builtin_only=False)
+
+# Get schema for specific operator
 get_operator_schema(operator_uri="@voxel51/brain/compute_similarity")
 ```
 
@@ -60,12 +63,16 @@ close_app()
 
 ### Step 1: Setup
 ```python
+# Set context
 set_context(dataset_name="my-dataset")
+
+# Launch app (required for brain operators)
 launch_app()
 ```
 
 ### Step 2: Verify Brain Plugin
 ```python
+# Check if brain plugin is available
 list_plugins(enabled=True)
 
 # If not installed:
@@ -78,13 +85,19 @@ enable_plugin(plugin_name="@voxel51/brain")
 
 ### Step 3: Discover Brain Operators
 ```python
+# List all available operators
 list_operators(builtin_only=False)
+
+# Get schema for compute_similarity
 get_operator_schema(operator_uri="@voxel51/brain/compute_similarity")
-get_operator_schema(operator_uri="@voxel51/brain/find_near_duplicates")
+
+# Get schema for find_duplicates
+get_operator_schema(operator_uri="@voxel51/brain/find_duplicates")
 ```
 
 ### Step 4: Compute Similarity
 ```python
+# Execute operator to compute embeddings
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={
@@ -117,15 +130,32 @@ This operator creates two saved views automatically:
 
 ### Step 6: View Duplicates in App
 
-After finding duplicates, direct the user to view them in the FiftyOne App:
+After finding duplicates, use `set_view` to display them in the FiftyOne App:
 
-**Option A: Use saved views (created automatically)**
-```
-Open http://localhost:5151/ and select the "near duplicates" saved view
+**Option A: Filter by near_dup_id field**
+```python
+# Show all samples that have a near_dup_id (all duplicates)
+set_view(exists=["near_dup_id"])
 ```
 
-**Option B: Filter by near_dup_id field**
-The operator adds a `near_dup_id` field to samples. Samples with the same ID are duplicates of each other.
+**Option B: Show specific duplicate group**
+```python
+# Show samples with a specific duplicate group ID
+set_view(filters={"near_dup_id": 1})
+```
+
+**Option C: Load saved view (if available)**
+```python
+# Load the automatically created saved view
+set_view(view_name="near duplicates")
+```
+
+**Option D: Clear filter to show all samples**
+```python
+clear_view()
+```
+
+The `find_near_duplicates` operator adds a `near_dup_id` field to samples. Samples with the same ID are duplicates of each other.
 
 ### Step 7: Delete Duplicates
 
@@ -138,8 +168,8 @@ execute_operator(
 ```
 
 **Option B: Manual deletion from App UI**
-1. Open http://localhost:5151/
-2. Load the "near duplicates" saved view
+1. Use `set_view(exists=["near_dup_id"])` to show duplicates
+2. Review samples in the App at http://localhost:5151/
 3. Select samples to delete
 4. Use the delete action in the App
 
@@ -148,7 +178,20 @@ execute_operator(
 close_app()
 ```
 
-## Available Brain Operators for Duplicates
+## Available Tools
+
+### Session View Tools
+
+| Tool | Description |
+|------|-------------|
+| `set_view(exists=[...])` | Filter samples where field(s) have non-None values |
+| `set_view(filters={...})` | Filter samples by exact field values |
+| `set_view(tags=[...])` | Filter samples by tags |
+| `set_view(sample_ids=[...])` | Select specific sample IDs |
+| `set_view(view_name="...")` | Load a saved view by name |
+| `clear_view()` | Clear filters, show all samples |
+
+### Brain Operators for Duplicates
 
 Use `list_operators()` to discover and `get_operator_schema()` to see parameters:
 
@@ -182,27 +225,35 @@ execute_operator(
 close_app()
 ```
 
-### Use Case 2: Find Near Duplicates
+### Use Case 2: Find and Review Near Duplicates
 For visually similar but not identical images:
 ```python
 set_context(dataset_name="my-dataset")
 launch_app()
 
+# Compute embeddings
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={"brain_key": "near_dups", "model": "mobilenet-v2-imagenet-torch"}
 )
 
+# Find duplicates
 execute_operator(
     operator_uri="@voxel51/brain/find_near_duplicates",
     params={"similarity_index": "near_dups", "threshold": 0.3}
 )
 
+# View duplicates in the App
+set_view(exists=["near_dup_id"])
+
+# After review, deduplicate
 execute_operator(
     operator_uri="@voxel51/brain/deduplicate_near_duplicates",
     params={}
 )
 
+# Clear view and close
+clear_view()
 close_app()
 ```
 
