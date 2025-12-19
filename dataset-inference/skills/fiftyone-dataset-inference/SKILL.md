@@ -254,6 +254,8 @@ execute_operator(
         "label_field": "predictions"
     }
 )
+
+set_view(exists=["predictions"]) 
 ```
 
 ### Use Case 2: Import COCO Dataset and Add Predictions
@@ -289,6 +291,8 @@ execute_operator(
         "label_field": "predictions"
     }
 )
+
+set_view(exists=["predictions"]) 
 ```
 
 ### Use Case 3: Import YOLO Dataset
