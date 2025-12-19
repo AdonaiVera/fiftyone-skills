@@ -92,7 +92,15 @@ execute_operator(
 )
 ```
 
-### Step 4: Import Samples
+### Step 4: Set Context
+
+Set context to the newly created dataset before importing:
+
+```python
+set_context(dataset_name="my-dataset")
+```
+
+### Step 5: Import Samples
 
 **For media only (no labels):**
 ```python
@@ -101,7 +109,7 @@ execute_operator(
     params={
         "import_type": "MEDIA_ONLY",
         "style": "DIRECTORY",
-        "directory": "/path/to/images"
+        "directory": {"absolute_path": "/path/to/images"}
     }
 )
 ```
@@ -113,20 +121,30 @@ execute_operator(
     params={
         "import_type": "MEDIA_AND_LABELS",
         "dataset_type": "COCO",
-        "data_path": "/path/to/images",
-        "labels_path": "/path/to/annotations.json",
+        "data_path": {"absolute_path": "/path/to/images"},
+        "labels_path": {"absolute_path": "/path/to/annotations.json"},
         "label_field": "ground_truth"
     }
 )
 ```
 
-### Step 5: Launch App
+### Step 6: Validate Import
+
+Verify samples imported correctly by comparing with source:
+
+```python
+load_dataset(name="my-dataset")
+```
+
+Compare `num_samples` with the file count from Step 1. Report any discrepancy to the user.
+
+### Step 7: Launch App
 
 ```python
 launch_app(dataset_name="my-dataset")
 ```
 
-### Step 6: Apply Model Inference
+### Step 8: Apply Model Inference
 
 Ask user for model name and label field for predictions.
 
@@ -140,13 +158,13 @@ execute_operator(
 )
 ```
 
-### Step 7: View Results
+### Step 9: View Results
 
 ```python
 set_view(exists=["predictions"])
 ```
 
-### Step 8: Clean Up
+### Step 10: Clean Up
 
 ```python
 close_app()
@@ -204,21 +222,23 @@ Popular models for `apply_zoo_model`:
 ### Use Case 1: Load Images and Run Detection
 
 ```python
-set_context(dataset_name="my-images")
-
 execute_operator(
     operator_uri="@voxel51/utils/create_dataset",
     params={"name": "my-images", "persistent": true}
 )
+
+set_context(dataset_name="my-images")
 
 execute_operator(
     operator_uri="@voxel51/io/import_samples",
     params={
         "import_type": "MEDIA_ONLY",
         "style": "DIRECTORY",
-        "directory": "/path/to/images"
+        "directory": {"absolute_path": "/path/to/images"}
     }
 )
+
+load_dataset(name="my-images")  # Validate import
 
 launch_app(dataset_name="my-images")
 
@@ -234,23 +254,25 @@ execute_operator(
 ### Use Case 2: Import COCO Dataset and Add Predictions
 
 ```python
-set_context(dataset_name="coco-dataset")
-
 execute_operator(
     operator_uri="@voxel51/utils/create_dataset",
     params={"name": "coco-dataset", "persistent": true}
 )
+
+set_context(dataset_name="coco-dataset")
 
 execute_operator(
     operator_uri="@voxel51/io/import_samples",
     params={
         "import_type": "MEDIA_AND_LABELS",
         "dataset_type": "COCO",
-        "data_path": "/path/to/images",
-        "labels_path": "/path/to/annotations.json",
+        "data_path": {"absolute_path": "/path/to/images"},
+        "labels_path": {"absolute_path": "/path/to/annotations.json"},
         "label_field": "ground_truth"
     }
 )
+
+load_dataset(name="coco-dataset")  # Validate import
 
 launch_app(dataset_name="coco-dataset")
 
@@ -266,22 +288,24 @@ execute_operator(
 ### Use Case 3: Import YOLO Dataset
 
 ```python
-set_context(dataset_name="yolo-dataset")
-
 execute_operator(
     operator_uri="@voxel51/utils/create_dataset",
     params={"name": "yolo-dataset", "persistent": true}
 )
+
+set_context(dataset_name="yolo-dataset")
 
 execute_operator(
     operator_uri="@voxel51/io/import_samples",
     params={
         "import_type": "MEDIA_AND_LABELS",
         "dataset_type": "YOLOv5",
-        "dataset_dir": "/path/to/yolo/dataset",
+        "dataset_dir": {"absolute_path": "/path/to/yolo/dataset"},
         "label_field": "ground_truth"
     }
 )
+
+load_dataset(name="yolo-dataset")  # Validate import
 
 launch_app(dataset_name="yolo-dataset")
 ```
@@ -300,22 +324,24 @@ For a folder structure like:
 ```
 
 ```python
-set_context(dataset_name="classification-dataset")
-
 execute_operator(
     operator_uri="@voxel51/utils/create_dataset",
     params={"name": "classification-dataset", "persistent": true}
 )
+
+set_context(dataset_name="classification-dataset")
 
 execute_operator(
     operator_uri="@voxel51/io/import_samples",
     params={
         "import_type": "MEDIA_AND_LABELS",
         "dataset_type": "Image Classification Directory Tree",
-        "dataset_dir": "/path/to/dataset",
+        "dataset_dir": {"absolute_path": "/path/to/dataset"},
         "label_field": "ground_truth"
     }
 )
+
+load_dataset(name="classification-dataset")  # Validate import
 
 launch_app(dataset_name="classification-dataset")
 ```
