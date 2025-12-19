@@ -47,6 +47,10 @@ Configure the MCP server in your AI assistant (Claude, ChatGPT, etc.) and instal
         <td><b><a href="find-duplicates/skills/fiftyone-find-duplicates/SKILL.md">Find Duplicates</a></b></td>
         <td>Find and remove duplicate or near-duplicate images using brain similarity computation</td>
     </tr>
+    <tr>
+        <td><b><a href="dataset-inference/skills/fiftyone-dataset-inference/SKILL.md">Dataset Inference</a></b></td>
+        <td>Create datasets from local directories, import labels (COCO, YOLO, VOC), and run model inference</td>
+    </tr>
 </table>
 
 ## Quick Start

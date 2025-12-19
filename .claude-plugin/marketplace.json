@@ -12,6 +12,11 @@
       "name": "fiftyone-find-duplicates",
       "source": "./find-duplicates",
       "description": "Find duplicate or near-duplicate images in FiftyOne datasets using brain similarity computation. Use when users want to deduplicate datasets, find similar images, cluster visually similar content, or remove redundant samples. Requires FiftyOne MCP server with @voxel51/brain plugin installed."
+    },
+    {
+      "name": "fiftyone-dataset-inference",
+      "source": "./dataset-inference",
+      "description": "Create FiftyOne datasets from local directories, import labels in standard formats (COCO, YOLO, VOC), and run model inference. Use when users want to load local files, apply ML models for detection, classification, or segmentation, or build end-to-end inference pipelines."
     }
   ]
 }

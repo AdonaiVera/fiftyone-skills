@@ -1,0 +1,21 @@
+{
+  "name": "fiftyone-dataset-inference",
+  "version": "1.0.0",
+  "description": "Create FiftyOne datasets from local directories, import labels in standard formats (COCO, YOLO, VOC), and run model inference. Works with the FiftyOne MCP server.",
+  "author": {
+    "name": "Voxel51"
+  },
+  "repository": "https://github.com/voxel51/fiftyone-skills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "fiftyone",
+    "computer-vision",
+    "inference",
+    "dataset",
+    "import",
+    "coco",
+    "yolo",
+    "detection",
+    "classification"
+  ]
+}
