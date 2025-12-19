@@ -152,6 +152,7 @@ Ask user for model name and label field for predictions.
 execute_operator(
     operator_uri="@voxel51/zoo/apply_zoo_model",
     params={
+        "tab": "BUILTIN",
         "model": "yolov8n-coco-torch",
         "label_field": "predictions"
     }
@@ -197,13 +198,16 @@ close_app()
 
 ## Common Zoo Models
 
-Popular models for `apply_zoo_model`:
+Popular models for `apply_zoo_model`. Some models require additional packages - if a model fails with a dependency error, the response includes the `install_command`. Offer to run it for the user.
 
-**Detection:**
+**Detection (PyTorch only):**
+- `faster-rcnn-resnet50-fpn-coco-torch` - Faster R-CNN (no extra deps)
+- `retinanet-resnet50-fpn-coco-torch` - RetinaNet (no extra deps)
+
+**Detection (requires ultralytics):**
 - `yolov8n-coco-torch` - YOLOv8 nano (fast)
 - `yolov8s-coco-torch` - YOLOv8 small
 - `yolov8m-coco-torch` - YOLOv8 medium
-- `faster-rcnn-resnet50-fpn-coco-torch` - Faster R-CNN
 
 **Classification:**
 - `resnet50-imagenet-torch` - ResNet-50
@@ -245,7 +249,8 @@ launch_app(dataset_name="my-images")
 execute_operator(
     operator_uri="@voxel51/zoo/apply_zoo_model",
     params={
-        "model": "yolov8n-coco-torch",
+        "tab": "BUILTIN",
+        "model": "faster-rcnn-resnet50-fpn-coco-torch",
         "label_field": "predictions"
     }
 )
@@ -279,7 +284,8 @@ launch_app(dataset_name="coco-dataset")
 execute_operator(
     operator_uri="@voxel51/zoo/apply_zoo_model",
     params={
-        "model": "yolov8m-coco-torch",
+        "tab": "BUILTIN",
+        "model": "faster-rcnn-resnet50-fpn-coco-torch",
         "label_field": "predictions"
     }
 )
@@ -305,7 +311,7 @@ execute_operator(
     }
 )
 
-load_dataset(name="yolo-dataset")  # Validate import
+load_dataset(name="yolo-dataset")  
 
 launch_app(dataset_name="yolo-dataset")
 ```
@@ -341,7 +347,7 @@ execute_operator(
     }
 )
 
-load_dataset(name="classification-dataset")  # Validate import
+load_dataset(name="classification-dataset")  
 
 launch_app(dataset_name="classification-dataset")
 ```
