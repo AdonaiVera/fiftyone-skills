@@ -94,9 +94,19 @@ list_operators(builtin_only=False)
 get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
 ```
 
-### Step 4: Compute Embeddings
+### Step 4: Check for Existing Embeddings or Compute New Ones
+
+First, check if the dataset already has embeddings by looking at the operator schema:
 ```python
-# Execute operator to compute embeddings
+get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
+# Look for existing embeddings fields in the "embeddings" choices
+# (e.g., "clip_embeddings", "dinov2_embeddings")
+```
+
+**If embeddings exist:** Skip to Step 5 and use the existing embeddings field.
+
+**If no embeddings exist:** Compute them:
+```python
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={
@@ -112,11 +122,25 @@ execute_operator(
 - `mobilenet-v2-imagenet-torch` - Fast, lightweight option
 
 ### Step 5: Compute 2D Visualization
+
+Use existing embeddings field OR the brain_key from Step 4:
 ```python
+# Option A: Use existing embeddings field (e.g., clip_embeddings)
 execute_operator(
     operator_uri="@voxel51/brain/compute_visualization",
     params={
         "brain_key": "img_viz",
+        "embeddings": "clip_embeddings",  # Use existing field
+        "method": "umap",
+        "num_dims": 2
+    }
+)
+
+# Option B: Use brain_key from compute_similarity
+execute_operator(
+    operator_uri="@voxel51/brain/compute_visualization",
+    params={
+        "brain_key": "img_viz",  # Same key used in compute_similarity
         "method": "umap",
         "num_dims": 2
     }
@@ -124,30 +148,25 @@ execute_operator(
 ```
 
 **Dimensionality reduction methods:**
-- `umap` - (Recommended) Preserves local and global structure, faster
-- `tsne` - Better local structure, slower on large datasets
+- `umap` - (Recommended) Preserves local and global structure, faster. Requires `umap-learn` package.
+- `tsne` - Better local structure, slower on large datasets. No extra dependencies.
 - `pca` - Linear reduction, fastest but less informative
 
-### Step 6: View Embeddings Panel in App
+### Step 6: Direct User to Embeddings Panel
 
-After computing visualization, open the FiftyOne App at http://localhost:5151/ and:
+After computing visualization, direct the user to open the FiftyOne App at http://localhost:5151/ and:
 
-1. Click the **Embeddings** panel icon (scatter plot) in the top toolbar
+1. Click the **Embeddings** panel icon (scatter plot icon, looks like a grid of dots) in the top toolbar
 2. Select the brain key (e.g., `img_viz`) from the dropdown
 3. Points represent samples in 2D embedding space
-4. Click points to select samples, lasso to select groups
+4. Use the **"Color by"** dropdown to color points by a field (e.g., `ground_truth`, `predictions`)
+5. Click points to select samples, use lasso tool to select groups
 
-### Step 7: Color by Field
+**IMPORTANT:** Do NOT use `set_view(exists=["brain_key"])` - this filters samples and is not needed for visualization. The Embeddings panel automatically shows all samples with computed coordinates.
 
-To color points by a specific field (class, tag, or metadata):
+### Step 7: Explore and Filter (Optional)
 
-**Option A: Color by classification field**
-```python
-# In the App Embeddings panel:
-# Use the "Color by" dropdown to select a field like "ground_truth" or "predictions"
-```
-
-**Option B: Use set_view to filter and explore**
+To filter samples while viewing in the Embeddings panel:
 ```python
 # Filter to specific class
 set_view(filters={"ground_truth.label": "dog"})
@@ -158,6 +177,8 @@ set_view(tags=["validated"])
 # Clear filter to show all
 clear_view()
 ```
+
+These filters will update the Embeddings panel to show only matching samples.
 
 ### Step 8: Find Outliers
 
@@ -234,26 +255,24 @@ Visualize dataset structure and explore clusters:
 set_context(dataset_name="my-dataset")
 launch_app()
 
-# Compute embeddings
-execute_operator(
-    operator_uri="@voxel51/brain/compute_similarity",
-    params={"brain_key": "exploration", "model": "clip-vit-base32-torch"}
-)
+# Check for existing embeddings in schema
+get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
 
-# Generate 2D visualization
+# If embeddings exist (e.g., clip_embeddings), use them directly:
 execute_operator(
     operator_uri="@voxel51/brain/compute_visualization",
     params={
         "brain_key": "exploration",
-        "method": "umap",
+        "embeddings": "clip_embeddings",
+        "method": "umap",  # or "tsne" if umap-learn not installed
         "num_dims": 2
     }
 )
 
-# Direct user to App Embeddings panel
-# Color by ground_truth or predictions field
-
-close_app()
+# Direct user to App Embeddings panel at http://localhost:5151/
+# 1. Click Embeddings panel icon
+# 2. Select "exploration" from dropdown
+# 3. Use "Color by" to color by ground_truth or predictions
 ```
 
 ### Use Case 2: Find Outliers in Dataset
@@ -262,7 +281,10 @@ Identify anomalous or mislabeled samples:
 set_context(dataset_name="my-dataset")
 launch_app()
 
-# Compute embeddings
+# Check for existing embeddings in schema
+get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
+
+# If no embeddings exist, compute them:
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={"brain_key": "outliers", "model": "clip-vit-base32-torch"}
@@ -274,20 +296,22 @@ execute_operator(
     params={"brain_key": "outliers"}
 )
 
-# Generate visualization
+# Generate visualization (use existing embeddings field or brain_key)
 execute_operator(
     operator_uri="@voxel51/brain/compute_visualization",
     params={
         "brain_key": "outliers",
-        "method": "umap",
+        "embeddings": "clip_embeddings",  # Use existing field if available
+        "method": "umap",  # or "tsne" if umap-learn not installed
         "num_dims": 2
     }
 )
 
-# View top outliers
-set_view(sort_by="uniqueness", reverse=True, limit=100)
-
-close_app()
+# Direct user to App at http://localhost:5151/
+# 1. Click Embeddings panel icon
+# 2. Select "outliers" from dropdown
+# 3. Outliers appear as isolated points far from clusters
+# 4. Optionally sort by uniqueness field in the App sidebar
 ```
 
 ### Use Case 3: Compare Classes in Embedding Space
@@ -296,29 +320,34 @@ See how different classes cluster:
 set_context(dataset_name="my-dataset")
 launch_app()
 
-# Compute embeddings
+# Check for existing embeddings in schema
+get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
+
+# If no embeddings exist, compute them:
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={"brain_key": "class_viz", "model": "clip-vit-base32-torch"}
 )
 
-# Generate visualization
+# Generate visualization (use existing embeddings field or brain_key)
 execute_operator(
     operator_uri="@voxel51/brain/compute_visualization",
     params={
         "brain_key": "class_viz",
-        "method": "umap",
+        "embeddings": "clip_embeddings",  # Use existing field if available
+        "method": "umap",  # or "tsne" if umap-learn not installed
         "num_dims": 2
     }
 )
 
-# In App: Color by classification field (ground_truth or predictions)
+# Direct user to App at http://localhost:5151/
+# 1. Click Embeddings panel icon
+# 2. Select "class_viz" from dropdown
+# 3. Use "Color by" dropdown to color by ground_truth or predictions
 # Look for:
 # - Well-separated clusters = good class distinction
 # - Overlapping clusters = similar classes or confusion
 # - Scattered points = high variance within class
-
-close_app()
 ```
 
 ### Use Case 4: Analyze Model Predictions
@@ -327,51 +356,64 @@ Compare ground truth vs predictions in embedding space:
 set_context(dataset_name="my-dataset")
 launch_app()
 
-# Compute embeddings
+# Check for existing embeddings in schema
+get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
+
+# If no embeddings exist, compute them:
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={"brain_key": "pred_analysis", "model": "clip-vit-base32-torch"}
 )
 
-# Generate visualization
+# Generate visualization (use existing embeddings field or brain_key)
 execute_operator(
     operator_uri="@voxel51/brain/compute_visualization",
     params={
         "brain_key": "pred_analysis",
-        "method": "umap",
+        "embeddings": "clip_embeddings",  # Use existing field if available
+        "method": "umap",  # or "tsne" if umap-learn not installed
         "num_dims": 2
     }
 )
 
-# In App Embeddings panel:
-# 1. Color by ground_truth - see true class distribution
-# 2. Color by predictions - see model's view
-# 3. Look for mismatches to find errors
-
-close_app()
+# Direct user to App at http://localhost:5151/
+# 1. Click Embeddings panel icon
+# 2. Select "pred_analysis" from dropdown
+# 3. Color by ground_truth - see true class distribution
+# 4. Color by predictions - see model's view
+# 5. Look for mismatches to find errors
 ```
 
 ### Use Case 5: t-SNE for Publication-Quality Plots
-Use t-SNE for better local structure (slower):
+Use t-SNE for better local structure (no extra dependencies):
 ```python
 set_context(dataset_name="my-dataset")
 launch_app()
 
+# Check for existing embeddings in schema
+get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
+
+# If no embeddings exist, compute them (DINOv2 for visual similarity):
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={"brain_key": "tsne_viz", "model": "dinov2-vits14-torch"}
 )
 
+# Generate t-SNE visualization (no umap-learn dependency needed)
 execute_operator(
     operator_uri="@voxel51/brain/compute_visualization",
     params={
         "brain_key": "tsne_viz",
+        "embeddings": "dinov2_embeddings",  # Use existing field if available
         "method": "tsne",
         "num_dims": 2
     }
 )
 
-close_app()
+# Direct user to App at http://localhost:5151/
+# 1. Click Embeddings panel icon
+# 2. Select "tsne_viz" from dropdown
+# 3. t-SNE provides better local cluster structure than UMAP
 ```
 
 ## Troubleshooting
@@ -388,19 +430,13 @@ close_app()
 - Cause: Brain plugin not installed
 - Solution: Install with `download_plugin()` and `enable_plugin()`
 
-**Error: "Missing dependency" (e.g., umap-learn, sklearn)**
-- The MCP server detects missing dependencies automatically
-- Response includes `missing_package` and `install_command`
-- Example response:
-  ```json
-  {
-    "error_type": "missing_dependency",
-    "missing_package": "umap-learn",
-    "install_command": "pip install umap-learn"
-  }
-  ```
-- Offer to run the install command for the user
-- After installation, restart MCP server and retry
+**Error: "You must install the `umap-learn>=0.5` package"**
+- Cause: UMAP method requires the `umap-learn` package
+- Solutions:
+  1. **Install umap-learn**: Ask user if they want to run `pip install umap-learn`
+  2. **Use t-SNE instead**: Change `method` to `"tsne"` (no extra dependencies)
+  3. **Use PCA instead**: Change `method` to `"pca"` (fastest, no extra dependencies)
+- After installing umap-learn, restart Claude Code/MCP server and retry
 
 **Visualization is slow**
 - Use UMAP instead of t-SNE for large datasets
