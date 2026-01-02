@@ -52,7 +52,13 @@ Embeddings are required for dimensionality reduction:
 ```python
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
-    params={"brain_key": "img_sim", "model": "clip-vit-base32-torch"}
+    params={
+        "brain_key": "img_sim",
+        "model": "clip-vit-base32-torch",
+        "embeddings": "clip_embeddings",
+        "backend": "sklearn",
+        "metric": "cosine"
+    }
 )
 ```
 
@@ -111,14 +117,25 @@ execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
     params={
         "brain_key": "img_viz",
-        "model": "clip-vit-base32-torch"
+        "model": "clip-vit-base32-torch",
+        "embeddings": "clip_embeddings",  # Field name to store embeddings
+        "backend": "sklearn",
+        "metric": "cosine"
     }
 )
 ```
 
+**Required parameters for compute_similarity:**
+- `brain_key` - Unique identifier for this brain run
+- `model` - Model from FiftyOne Model Zoo to generate embeddings
+- `embeddings` - Field name where embeddings will be stored
+- `backend` - Similarity backend (use `"sklearn"`)
+- `metric` - Distance metric (use `"cosine"` or `"euclidean"`)
+
 **Recommended embedding models:**
 - `clip-vit-base32-torch` - Best for general visual + semantic similarity
 - `dinov2-vits14-torch` - Best for visual similarity only
+- `resnet50-imagenet-torch` - Classic CNN features
 - `mobilenet-v2-imagenet-torch` - Fast, lightweight option
 
 ### Step 5: Compute 2D Visualization
@@ -287,7 +304,13 @@ get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
 # If no embeddings exist, compute them:
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
-    params={"brain_key": "outliers", "model": "clip-vit-base32-torch"}
+    params={
+        "brain_key": "outliers",
+        "model": "clip-vit-base32-torch",
+        "embeddings": "clip_embeddings",
+        "backend": "sklearn",
+        "metric": "cosine"
+    }
 )
 
 # Compute uniqueness scores
@@ -326,7 +349,13 @@ get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
 # If no embeddings exist, compute them:
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
-    params={"brain_key": "class_viz", "model": "clip-vit-base32-torch"}
+    params={
+        "brain_key": "class_viz",
+        "model": "clip-vit-base32-torch",
+        "embeddings": "clip_embeddings",
+        "backend": "sklearn",
+        "metric": "cosine"
+    }
 )
 
 # Generate visualization (use existing embeddings field or brain_key)
@@ -362,7 +391,13 @@ get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
 # If no embeddings exist, compute them:
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
-    params={"brain_key": "pred_analysis", "model": "clip-vit-base32-torch"}
+    params={
+        "brain_key": "pred_analysis",
+        "model": "clip-vit-base32-torch",
+        "embeddings": "clip_embeddings",
+        "backend": "sklearn",
+        "metric": "cosine"
+    }
 )
 
 # Generate visualization (use existing embeddings field or brain_key)
@@ -396,7 +431,13 @@ get_operator_schema(operator_uri="@voxel51/brain/compute_visualization")
 # If no embeddings exist, compute them (DINOv2 for visual similarity):
 execute_operator(
     operator_uri="@voxel51/brain/compute_similarity",
-    params={"brain_key": "tsne_viz", "model": "dinov2-vits14-torch"}
+    params={
+        "brain_key": "tsne_viz",
+        "model": "dinov2-vits14-torch",
+        "embeddings": "dinov2_embeddings",
+        "backend": "sklearn",
+        "metric": "cosine"
+    }
 )
 
 # Generate t-SNE visualization (no umap-learn dependency needed)
