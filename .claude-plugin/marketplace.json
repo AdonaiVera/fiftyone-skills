@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Agent Context Protocol (ACP) skills for computer vision workflows using FiftyOne.",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "plugins": [
     {
