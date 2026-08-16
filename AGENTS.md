@@ -6,7 +6,7 @@ This repository contains skills for computer vision workflows using FiftyOne and
 
 ### FiftyOne Dataset Import (`fiftyone-dataset-import/`)
 
-**When to use:** User wants to import datasets from local files, Hugging Face Hub, or any supported format (COCO, YOLO, VOC, KITTI, etc.), including multimodal grouped datasets.
+**When to use:** User wants to import datasets from local files, Hugging Face Hub, or any supported format (COCO, YOLO, VOC, KITTI, etc.), including multimodal grouped datasets and MCAP robotics/AV sensor recordings.
 
 **Instructions:** Load the skill file at `skills/fiftyone-dataset-import/SKILL.md`
 
@@ -30,6 +30,9 @@ This repository contains skills for computer vision workflows using FiftyOne and
 - COCO, YOLO, VOC, KITTI, CVAT annotations
 - Hugging Face Hub (FiftyOne-formatted, parquet, or raw formats)
 - Multimodal grouped datasets (autonomous driving)
+- MCAP robotics/AV sensor recordings; see `MCAP-TROUBLESHOOTING.md`, `MCAP-AUTHORING.md`, and
+  `MCAP-DATASET-AND-VALIDATION.md` in the skill directory for authoring, converting, and
+  troubleshooting beyond a plain import
 
 ### FiftyOne Dataset Export (`fiftyone-dataset-export/`)
 
